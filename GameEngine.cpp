@@ -116,7 +116,7 @@ CollisionSide GameEngine::areColliding(sf::CircleShape r1, sf::RectangleShape r2
 void GameEngine::Gravity(sf::RectangleShape &fallingobject, CollisionSide isfalling) {
 	static double velocity = 0.001;
 	double acceleration = 0.000010;
-	if (isfalling.bottom == false) {
+	if (isfalling.top == false) {
 		sf::Vector2f objectposition = fallingobject.getPosition();
 		fallingobject.move(0.0f, velocity);
 		if (velocity < 20) {
