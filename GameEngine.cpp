@@ -51,6 +51,8 @@ CollisionSide GameEngine::areColliding(sf::RectangleShape r1, sf::RectangleShape
 	}
 	if (pos1.y + size1.y > pos2.y && pos1.x < pos2.x + size2.x && pos1.x + size1.x > pos2.x && pos1.y == pos2.y + size2.x) {
 		collisions.bottom = true;
+		std::cout << collisions.bottom << std::endl;
+		system("pause");
 	}
 
 	return collisions;
@@ -110,4 +112,32 @@ CollisionSide GameEngine::areColliding(sf::CircleShape r1, sf::RectangleShape r2
 	}
 	return c;
 	
+}
+void GameEngine::Gravity(sf::RectangleShape &fallingobject, CollisionSide isfalling) {
+	static double velocity = 0.001;
+	double acceleration = 0.000010;
+	if (isfalling.bottom == false) {
+		sf::Vector2f objectposition = fallingobject.getPosition();
+		fallingobject.move(0.0f, velocity);
+		if (velocity < 20) {
+			velocity += acceleration;
+		}
+	}
+	else {
+		velocity = 1.0;
+	}
+}
+void GameEngine::Gravity(sf::CircleShape& fallingobject, CollisionSide isfalling) {
+	static double velocity = 0.001;
+	double acceleration = 0.000010;
+	if (isfalling.top == false) {
+		sf::Vector2f objectposition = fallingobject.getPosition();
+		fallingobject.move(0.0f, velocity);
+		if (velocity < 20) {
+			velocity += acceleration;
+		}
+	}
+	else {
+		velocity = 1.0;
+	}
 }
