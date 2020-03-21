@@ -11,8 +11,8 @@ public:
 	bool MouseClick(sf::CircleShape, sf::Event::MouseButtonEvent);
 	CollisionSide areColliding(sf::RectangleShape, sf::RectangleShape referencePoint);
 	CollisionSide areColliding(sf::CircleShape, sf::RectangleShape);
-	void Gravity(sf::RectangleShape &fallingobject, CollisionSide isfalling);
-	void Gravity(sf::CircleShape& fallingobject, CollisionSide isfalling);
+	void Gravity(sf::RectangleShape &fallingobject, CollisionSide baseCollisionObject);
+	void Gravity(sf::CircleShape& fallingobject, CollisionSide baseCollisionObject);
 	//CollisionSide areColliding(sf::CircleShape, sf::CircleShape);
 };
 
