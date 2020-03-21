@@ -56,6 +56,58 @@ CollisionSide GameEngine::areColliding(sf::RectangleShape r1, sf::RectangleShape
 	return collisions;
 }
 CollisionSide GameEngine::areColliding(sf::CircleShape r1, sf::RectangleShape r2) {
-	
+	CollisionSide c;
+	c.left = false;
+	c.right = false;
+	c.bottom = false;
+	c.top = false;
+	sf::Vector2f CirclePosition = r1.getPosition();
+	double CircleSize = r1.getRadius();
+	CirclePosition.x += CircleSize;
+	CirclePosition.y += CircleSize;
+	sf::Vector2f RectanglePosition = r2.getPosition();
+	sf::Vector2f RectangleSize = r2.getSize();
+	sf::Vector2f Collisioncoords = CirclePosition;
+	Collisioncoords.x = CirclePosition.x + CircleSize;
+	Collisioncoords.y = CirclePosition.y;
+	for (double angle = 0.0,incrementer=0.0; angle <= 90; angle += 3,incrementer+= 0.03333333) {
+		if ((((Collisioncoords.x - CircleSize * incrementer) >= (RectanglePosition.x)) && ((Collisioncoords.x - CircleSize * incrementer) <= (RectanglePosition.x + 3.5))) && (((Collisioncoords.y - CircleSize * incrementer) >= (RectanglePosition.y)) && ((Collisioncoords.y - CircleSize * incrementer) <= (RectanglePosition.y + RectangleSize.y)))) {
+			c.left = true;
+		}
+		if ((((Collisioncoords.x - CircleSize * incrementer) >= (RectanglePosition.x)) && ((Collisioncoords.x - CircleSize * incrementer) <= (RectanglePosition.x + RectangleSize.x))) && (((Collisioncoords.y - CircleSize * incrementer) >= (RectanglePosition.y+RectangleSize.y-3.5)) && ((Collisioncoords.y - CircleSize * incrementer) <= (RectanglePosition.y + RectangleSize.y)))) {
+			c.bottom=true;
+		}
+	}
+	Collisioncoords.x = CirclePosition.x;
+	Collisioncoords.y = CirclePosition.y - CircleSize;
+	for (double angle = 90, incrementer = 0.0; angle <= 180; angle += 3, incrementer += 0.03333333) {
+		if ((((Collisioncoords.x - CircleSize * incrementer) >= (RectanglePosition.x+RectangleSize.x-3.5)) && ((Collisioncoords.x - CircleSize * incrementer) <= (RectanglePosition.x + RectangleSize.x))) && (((Collisioncoords.y + CircleSize * incrementer) >= (RectanglePosition.y)) && ((Collisioncoords.y + CircleSize * incrementer) <= (RectanglePosition.y + RectangleSize.y)))) {
+			c.right = true;
+		}
+		if ((((Collisioncoords.x - CircleSize * incrementer) >= (RectanglePosition.x)) && ((Collisioncoords.x - CircleSize * incrementer) <= (RectanglePosition.x + RectangleSize.x))) && (((Collisioncoords.y + CircleSize * incrementer) >= (RectanglePosition.y + RectangleSize.y - 3.5)) && ((Collisioncoords.y + CircleSize * incrementer) <= (RectanglePosition.y + RectangleSize.y)))) {
+			c.bottom = true;
+		}
+	}
+	Collisioncoords.x = CirclePosition.x-CircleSize;
+	Collisioncoords.y = CirclePosition.y;
+	for (double angle = 180,incrementer=0.0; angle <= 270; angle += 3,incrementer+= 0.03333333) {
+		if ((((Collisioncoords.x + CircleSize * incrementer) >= (RectanglePosition.x )) && ((Collisioncoords.x + CircleSize * incrementer) <= (RectanglePosition.x + RectangleSize.x))) && (((Collisioncoords.y + CircleSize * incrementer) >= (RectanglePosition.y)) && ((Collisioncoords.y + CircleSize * incrementer) <= (RectanglePosition.y +3.5)))) {
+			c.top = true;
+		}
+		if ((((Collisioncoords.x + CircleSize * incrementer) >= (RectanglePosition.x + RectangleSize.x - 3.5)) && ((Collisioncoords.x + CircleSize * incrementer) <= (RectanglePosition.x + RectangleSize.x))) && (((Collisioncoords.y + CircleSize * incrementer) >= (RectanglePosition.y )) && ((Collisioncoords.y + CircleSize * incrementer) <= (RectanglePosition.y + RectangleSize.y)))) {
+			c.right = true;
+		}
+	}
+	Collisioncoords.x = CirclePosition.x;
+	Collisioncoords.y = CirclePosition.y+CircleSize;
+	for (double angle = 270,incrementer=0.0; angle <= 360; angle += 3,incrementer+= 0.03333333) {
+		if ((((Collisioncoords.x + CircleSize * incrementer) >= (RectanglePosition.x)) && ((Collisioncoords.x + CircleSize * incrementer) <= (RectanglePosition.x + RectangleSize.x))) && (((Collisioncoords.y - CircleSize * incrementer) >= (RectanglePosition.y)) && ((Collisioncoords.y - CircleSize * incrementer) <= (RectanglePosition.y + 3.5)))) {
+			c.top = true;
+		}
+		if ((((Collisioncoords.x + CircleSize * incrementer) >= (RectanglePosition.x)) && ((Collisioncoords.x + CircleSize * incrementer) <= (RectanglePosition.x + 3.5))) && (((Collisioncoords.y - CircleSize * incrementer) >= (RectanglePosition.y)) && ((Collisioncoords.y - CircleSize * incrementer) <= (RectanglePosition.y + RectangleSize.y)))) {
+			c.left = true;
+		}
+	}
 	return c;
+	
 }
