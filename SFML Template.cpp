@@ -1,6 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include "GameEngine.h"
 #include<iostream>
+#include<string>
+
+
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(900, 900), "SFML works!");
@@ -8,15 +11,19 @@ int main() {
 	sf::RectangleShape base(sf::Vector2f(900, 50));
 	base.setPosition(0, 800);
 	CollisionSide shape1collisions;
+    sf::Texture left;
+    left.loadFromFile("assets\\left.png");
+    sf::Texture right;
+    right.loadFromFile("assets\\right.png");
 	shape1collisions.bottom = false;
-    shape1.setFillColor(sf::Color::Red);
+    
     shape1.setPosition(100.f, 100.f);
     sf::CircleShape shape(50.f);
 	shape.setPosition(300, 50);
     shape.setFillColor(sf::Color::Blue);
     GameEngine g;
     CollisionSide collisions;
-
+    sf::View view2(sf::Vector2f(0.f, 0.f), sf::Vector2f(900.f, 900.f));
     while (window.isOpen())
     {
         sf::Event event;
@@ -25,35 +32,18 @@ int main() {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            shape.move(-0.01f, 0.f);
+        if (g.MouseClick(shape1, event.mouseButton)) {
+            std::cout << "clicked";
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            shape.move(0.01f, 0.f);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            shape.move(0.f, -0.01f);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            shape.move(0.f, 0.01f);
-        }
-        collisions = g.areColliding(shape, shape1);
-        if (collisions.left)
-            std::cout << "left" << std::endl;
-        if (collisions.right)
-            std::cout << "right" << std::endl;
-        if (collisions.top)
-            std::cout << "top" << std::endl;
-        if (collisions.bottom)
-            std::cout << "bottom" << std::endl;
-		shape1collisions = g.areColliding(shape, base);
-		g.Gravity(shape, shape1collisions);
+        g.enableMovement(shape1);
+		g.Gravity(shape1, base);
+        g.animation(shape1, &left, &right, &right, &right);
         window.clear();
-        window.draw(shape);
+        //window.draw(shape);
         window.draw(shape1);
 		window.draw(base);
-        window.display();
+        //window.setView(view2);
+        window.display();   
     }
-
     return 0;
 }

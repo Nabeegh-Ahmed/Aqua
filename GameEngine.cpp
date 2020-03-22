@@ -2,6 +2,8 @@
 #include<SFML/Graphics.hpp>
 #include<iostream>
 #include<math.h>
+#include<string>
+using namespace std;
 
 bool GameEngine::MouseClick(sf::RectangleShape target, sf::Event::MouseButtonEvent mouse) {
 	sf::Vector2f targetPos = target.getPosition();
@@ -113,7 +115,64 @@ CollisionSide GameEngine::areColliding(sf::CircleShape r1, sf::RectangleShape r2
 	return c;
 	
 }
-void GameEngine::Gravity(sf::RectangleShape &fallingobject, CollisionSide isfalling) {
+void GameEngine::Gravity(sf::RectangleShape &fallingobject, sf::RectangleShape& base) {
+	CollisionSide _base = this->areColliding(fallingobject, base);
+	static double velocity = 0.01;
+	double acceleration = 0.0010;
+	if (_base.top == false) {
+		sf::Vector2f objectposition = fallingobject.getPosition();
+		fallingobject.move(0.0f, velocity);
+		if (velocity < 20) {
+			velocity += acceleration;
+		}
+	}
+	else {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+			fallingobject.move(0.f, -1.f);
+		}
+		velocity = 0.001;
+	}
+}
+void GameEngine::Gravity(sf::CircleShape& fallingobject, sf::RectangleShape& base) {
+	CollisionSide _base = this->areColliding(fallingobject, base);
+	static double velocity = 0.1;
+	double acceleration = 0.010;
+	if (_base.top == false) {
+		sf::Vector2f objectposition = fallingobject.getPosition();
+		fallingobject.move(0.0f, velocity);
+		if (velocity < 20) {
+			velocity += acceleration;
+		}
+	}
+	else {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+			fallingobject.move(0.f, -1.f);
+		}
+		velocity = 0.1;
+	}
+}
+void GameEngine::animation(sf::RectangleShape& shape, sf::Texture* left, sf::Texture* right, sf::Texture* up, sf::Texture* down) {
+	static int xvelocity = 0.1;
+	static int yvelocity = 0.1;
+	int lastyvelocity = yvelocity;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+		shape.setTexture(left);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+		shape.setTexture(right);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+		// Up sprite
+		yvelocity++;
+	}
+	else {
+		yvelocity--;
+	}
+	if (lastyvelocity > yvelocity) {
+		// downsprite
+	}
+}
+void GameEngine::Gravity(sf::RectangleShape& fallingobject, CollisionSide isfalling) {
 	static double velocity = 0.001;
 	double acceleration = 0.000010;
 	if (isfalling.top == false) {
@@ -139,5 +198,33 @@ void GameEngine::Gravity(sf::CircleShape& fallingobject, CollisionSide isfalling
 	}
 	else {
 		velocity = 1.0;
+	}
+}
+void GameEngine::enableMovement(sf::RectangleShape& shape) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+		shape.move(-1.f, 0.f);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+		shape.move(1.f, 0.f);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+		shape.move(0.f, -3.f);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+		shape.move(0.f, 1.f);
+	}
+}
+void GameEngine::enableMovement(sf::CircleShape& shape) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+		shape.move(-1.f, 0.f);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+		shape.move(1.f, 0.f);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+		shape.move(0.f, -3.f);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+		shape.move(0.f, 1.f);
 	}
 }
