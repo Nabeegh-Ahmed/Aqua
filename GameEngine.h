@@ -19,6 +19,7 @@ public:
 	void Gravity(sf::CircleShape& fallingobject, CollisionSide baseCollisionObject);
 	void enableMovement(sf::RectangleShape& shape);
 	void enableMovement(sf::CircleShape& shape);
+	void moveView(sf::RectangleShape&, sf::View&);
 	//CollisionSide areColliding(sf::CircleShape, sf::CircleShape);
 };
 

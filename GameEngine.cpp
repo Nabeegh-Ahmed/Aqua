@@ -51,10 +51,8 @@ CollisionSide GameEngine::areColliding(sf::RectangleShape r1, sf::RectangleShape
 	if (pos1.y + size1.y > pos2.y && pos1.x < pos2.x + size2.x && pos1.x + size1.x > pos2.x && pos1.y < pos2.y) {
 		collisions.top = true;
 	}
-	if (pos1.y + size1.y > pos2.y && pos1.x < pos2.x + size2.x && pos1.x + size1.x > pos2.x && pos1.y == pos2.y + size2.x) {
+	if (pos2.y + size2.y > pos1.y && pos2.x < pos1.x + size1.x && pos2.x + size2.x > pos1.x && pos2.y < pos1.y) {
 		collisions.bottom = true;
-		std::cout << collisions.bottom << std::endl;
-		system("pause");
 	}
 
 	return collisions;
@@ -130,7 +128,11 @@ void GameEngine::Gravity(sf::RectangleShape &fallingobject, sf::RectangleShape& 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 			fallingobject.move(0.f, -1.f);
 		}
+		
 		velocity = 0.001;
+	}
+	if (_base.bottom) {
+		fallingobject.move(0.f, 3.f);
 	}
 }
 void GameEngine::Gravity(sf::CircleShape& fallingobject, sf::RectangleShape& base) {
@@ -227,4 +229,9 @@ void GameEngine::enableMovement(sf::CircleShape& shape) {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 		shape.move(0.f, 1.f);
 	}
+}
+void GameEngine::moveView(sf::RectangleShape& shape, sf::View& view) {
+	sf::Vector2f pos = shape.getPosition();
+	view.setSize(sf::Vector2f(shape.getSize().x * 5, shape.getSize().x * 5));
+	view.setCenter(sf::Vector2f(pos.x+shape.getSize().x/2, pos.y));
 }
