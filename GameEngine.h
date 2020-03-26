@@ -5,7 +5,6 @@ struct CollisionSide {
 	bool top, bottom, left, right;
 };
 
-
 class GameEngine {
 public:
 	bool MouseClick(sf::RectangleShape, sf::Event::MouseButtonEvent);
@@ -20,6 +19,9 @@ public:
 	void enableMovement(sf::RectangleShape& shape);
 	void enableMovement(sf::CircleShape& shape);
 	void moveView(sf::RectangleShape&, sf::View&);
+	void Light(sf::RectangleShape, sf::Shader&);
+	void FollowLight(sf::RectangleShape, sf::Shader&);
+	void Light(sf::CircleShape, sf::Shader&);
 	//CollisionSide areColliding(sf::CircleShape, sf::CircleShape);
 };
 

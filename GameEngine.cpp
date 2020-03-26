@@ -2,7 +2,7 @@
 #include<SFML/Graphics.hpp>
 #include<iostream>
 #include<math.h>
-#include<string>
+
 using namespace std;
 
 bool GameEngine::MouseClick(sf::RectangleShape target, sf::Event::MouseButtonEvent mouse) {
@@ -128,7 +128,6 @@ void GameEngine::Gravity(sf::RectangleShape &fallingobject, sf::RectangleShape& 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 			fallingobject.move(0.f, -1.f);
 		}
-		
 		velocity = 0.001;
 	}
 	if (_base.bottom) {
@@ -175,8 +174,8 @@ void GameEngine::animation(sf::RectangleShape& shape, sf::Texture* left, sf::Tex
 	}
 }
 void GameEngine::Gravity(sf::RectangleShape& fallingobject, CollisionSide isfalling) {
-	static double velocity = 0.001;
-	double acceleration = 0.000010;
+	static double velocity = 0.1;
+	double acceleration = 0.0010;
 	if (isfalling.top == false) {
 		sf::Vector2f objectposition = fallingobject.getPosition();
 		fallingobject.move(0.0f, velocity);
@@ -185,12 +184,15 @@ void GameEngine::Gravity(sf::RectangleShape& fallingobject, CollisionSide isfall
 		}
 	}
 	else {
-		velocity = 1.0;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+			fallingobject.move(0.f, -1.f);
+		}
+		velocity = 0.001;
 	}
 }
 void GameEngine::Gravity(sf::CircleShape& fallingobject, CollisionSide isfalling) {
-	static double velocity = 0.001;
-	double acceleration = 0.000010;
+	static double velocity = 0.1;
+	double acceleration = 0.0010;
 	if (isfalling.top == false) {
 		sf::Vector2f objectposition = fallingobject.getPosition();
 		fallingobject.move(0.0f, velocity);
@@ -199,7 +201,10 @@ void GameEngine::Gravity(sf::CircleShape& fallingobject, CollisionSide isfalling
 		}
 	}
 	else {
-		velocity = 1.0;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+			fallingobject.move(0.f, -1.f);
+		}
+		velocity = 0.001;
 	}
 }
 void GameEngine::enableMovement(sf::RectangleShape& shape) {
@@ -234,4 +239,24 @@ void GameEngine::moveView(sf::RectangleShape& shape, sf::View& view) {
 	sf::Vector2f pos = shape.getPosition();
 	view.setSize(sf::Vector2f(shape.getSize().x * 5, shape.getSize().x * 5));
 	view.setCenter(sf::Vector2f(pos.x+shape.getSize().x/2, pos.y));
+}
+
+void GameEngine::Light(sf::RectangleShape base, sf::Shader& shader) {
+	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
+	shader.setUniform("hasTexture", true);
+	sf::Vector2f pos;
+	pos.x = base.getPosition().x;
+	pos.y = base.getPosition().y - base.getSize().y;
+	shader.setUniform("lightPos", pos);
+}
+
+void GameEngine::FollowLight(sf::RectangleShape shape, sf::Shader& shader) {
+	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
+	shader.setUniform("hasTexture", true);
+	shader.setUniform("lightPos", sf::Vector2f(shape.getPosition().x+shape.getSize().x/2, shape.getPosition().y - shape.getSize().y*2));
+}
+
+void GameEngine::Light(sf::CircleShape s1, sf::Shader& shader) {
+	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
+	shader.setUniform("hasTexture", true);
 }
