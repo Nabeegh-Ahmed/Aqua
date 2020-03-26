@@ -2,7 +2,8 @@
 #include<SFML/Graphics.hpp>
 #include<iostream>
 #include<math.h>
-
+#include <stdlib.h>
+#include <time.h>
 using namespace std;
 
 bool GameEngine::MouseClick(sf::RectangleShape target, sf::Event::MouseButtonEvent mouse) {
@@ -259,4 +260,119 @@ void GameEngine::FollowLight(sf::RectangleShape shape, sf::Shader& shader) {
 void GameEngine::Light(sf::CircleShape s1, sf::Shader& shader) {
 	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
 	shader.setUniform("hasTexture", true);
+}
+void GameEngine::ShapeRepeater(sf::RectangleShape POV,sf::RectangleShape &ShapeToRepeat, sf::RenderWindow & screen, sf::Vector2f& StartingPos, float DistanceBetweenShape) {
+	int i = 0;
+	int counter = 0;
+	static int numberofshapes=0;
+	static int* ptrtoheights=0;
+	static bool firsttime = true;
+	static bool firstfunctionsturn = true;
+	sf::Vector2f generatedposition(StartingPos);
+	sf::Vector2f calculationusedposition(StartingPos);
+	sf::Vector2f sizeofshape(ShapeToRepeat.getSize());
+	sf::Vector2f screendimensions;
+	sf::Vector2f originalposition;
+	screendimensions.x = screen.getSize().x;
+	screendimensions.y = screen.getSize().y;
+	if (StartingPos.x+screen.getSize().x <= POV.getPosition().x ||firsttime==true) {
+		StartingPos.x = POV.getPosition().x-300;
+		numberofshapes = 0;
+		i = rand() % (3 - 1 + 1) + 1;
+		while (calculationusedposition.x + sizeofshape.x + DistanceBetweenShape < (screendimensions.x) * 2 + StartingPos.x) {
+			calculationusedposition.x += sizeofshape.x + DistanceBetweenShape;
+			numberofshapes++;
+		}
+		if (firsttime) {
+			ptrtoheights = new int[numberofshapes];
+			firsttime = false;
+		}
+		else {
+			delete[]ptrtoheights; 
+			ptrtoheights = new int[numberofshapes];
+
+		}
+		for (int index = 0; index < numberofshapes; index++) {
+			this->HeightRandomizer(ShapeToRepeat, ShapeToRepeat.getSize().y);
+			ptrtoheights[index] = ShapeToRepeat.getSize().y;
+		}
+		switch (i) {
+		case 1:
+			ShapeToRepeat.setFillColor(sf::Color::Cyan);
+			break;
+		case 2:
+			ShapeToRepeat.setFillColor(sf::Color::Red);
+			break;
+		case 3:
+			ShapeToRepeat.setFillColor(sf::Color::Magenta);
+			break;
+		}
+	}
+	if (StartingPos.x -5>= POV.getPosition().x) {
+		StartingPos.x= POV.getPosition().x-(screen.getSize().x);
+		i = rand() % (3 - 1 + 1) + 1;
+		while (calculationusedposition.x + sizeofshape.x + DistanceBetweenShape < (screendimensions.x) * 2 + StartingPos.x) {
+			calculationusedposition.x += sizeofshape.x + DistanceBetweenShape;
+			numberofshapes++;
+		}
+		if (firsttime) {
+			ptrtoheights = new int[numberofshapes];
+			firsttime = false;
+		}
+		else {
+			delete[]ptrtoheights;
+			ptrtoheights = new int[numberofshapes];
+
+		}
+		for (int index = 0; index < numberofshapes; index++) {
+			this->HeightRandomizer(ShapeToRepeat, ShapeToRepeat.getSize().y);
+			ptrtoheights[index] = ShapeToRepeat.getSize().y;
+		}
+		switch (i) {
+		case 1:
+			ShapeToRepeat.setFillColor(sf::Color::White);
+			break;
+		case 2:
+			ShapeToRepeat.setFillColor(sf::Color::Yellow);
+			break;
+		case 3:
+			ShapeToRepeat.setFillColor(sf::Color::Green);
+			break;
+		}
+	}
+	while (generatedposition.x + sizeofshape.x + DistanceBetweenShape < (screendimensions.x) * 2 + StartingPos.x) {
+		ShapeToRepeat.setPosition(generatedposition);
+		ShapeToRepeat.setSize(sf::Vector2f(ShapeToRepeat.getSize().x,ptrtoheights[counter]));
+		if (!firstfunctionsturn) {
+			originalposition.x = ShapeToRepeat.getPosition().x;
+			originalposition.y = ShapeToRepeat.getPosition().y;
+			ShapeToRepeat.setPosition(sf::Vector2f(ShapeToRepeat.getPosition().x,ShapeToRepeat.getPosition().y-ShapeToRepeat.getSize().y) );
+		}
+		else {
+			
+		}
+		screen.draw(ShapeToRepeat);
+		generatedposition.x += sizeofshape.x + DistanceBetweenShape;
+		counter++;
+	}
+	if (!firstfunctionsturn) {
+		firstfunctionsturn = true;
+		ShapeToRepeat.setPosition(originalposition);
+	}
+	else {
+		firstfunctionsturn = false;
+	}
+
+	
+}
+void GameEngine::HeightRandomizer(sf::RectangleShape& ShapeToAlter, int HeightOfShape) {
+	static int originalheight;
+	static bool firsttime = true;
+	if (firsttime) {
+		originalheight = HeightOfShape;
+		firsttime = false;
+	}
+	int percentcutoff = 0;
+	percentcutoff = (rand() % (70 - 10 + 1)) + 10;
+	ShapeToAlter.setSize(sf::Vector2f(ShapeToAlter.getSize().x, (percentcutoff / 100.0f) * originalheight));
 }
