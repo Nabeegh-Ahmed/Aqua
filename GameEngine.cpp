@@ -1,9 +1,7 @@
 #include "GameEngine.h"
 #include<SFML/Graphics.hpp>
-#include<iostream>
 #include<math.h>
-#include <stdlib.h>
-#include <time.h>
+#include<string>
 using namespace std;
 
 bool GameEngine::MouseClick(sf::RectangleShape target, sf::Event::MouseButtonEvent mouse) {
@@ -164,14 +162,14 @@ void GameEngine::animation(sf::RectangleShape& shape, sf::Texture* left, sf::Tex
 		shape.setTexture(right);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-		// Up sprite
+		shape.setTexture(up);
 		yvelocity++;
 	}
 	else {
 		yvelocity--;
 	}
-	if (lastyvelocity > yvelocity) {
-		// downsprite
+	if (lastyvelocity > yvelocity || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+		shape.setTexture(down);
 	}
 }
 void GameEngine::Gravity(sf::RectangleShape& fallingobject, CollisionSide isfalling) {
@@ -241,7 +239,6 @@ void GameEngine::moveView(sf::RectangleShape& shape, sf::View& view) {
 	view.setSize(sf::Vector2f(shape.getSize().x * 5, shape.getSize().x * 5));
 	view.setCenter(sf::Vector2f(pos.x+shape.getSize().x/2, pos.y));
 }
-
 void GameEngine::Light(sf::RectangleShape base, sf::Shader& shader) {
 	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
 	shader.setUniform("hasTexture", true);
@@ -250,13 +247,11 @@ void GameEngine::Light(sf::RectangleShape base, sf::Shader& shader) {
 	pos.y = base.getPosition().y - base.getSize().y;
 	shader.setUniform("lightPos", pos);
 }
-
 void GameEngine::FollowLight(sf::RectangleShape shape, sf::Shader& shader) {
 	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
 	shader.setUniform("hasTexture", true);
 	shader.setUniform("lightPos", sf::Vector2f(shape.getPosition().x+shape.getSize().x/2, shape.getPosition().y - shape.getSize().y*2));
 }
-
 void GameEngine::Light(sf::CircleShape s1, sf::Shader& shader) {
 	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
 	shader.setUniform("hasTexture", true);
@@ -292,10 +287,10 @@ void GameEngine::ShapeRepeater(sf::RectangleShape POV,sf::RectangleShape &ShapeT
 			ptrtoheights = new int[numberofshapes];
 
 		}
-		for (int index = 0; index < numberofshapes; index++) {
-			this->HeightRandomizer(ShapeToRepeat, ShapeToRepeat.getSize().y);
-			ptrtoheights[index] = ShapeToRepeat.getSize().y;
-		}
+		//for (int index = 0; index < numberofshapes; index++) {
+		//	this->HeightRandomizer(ShapeToRepeat, ShapeToRepeat.getSize().y);
+		//	ptrtoheights[index] = ShapeToRepeat.getSize().y;
+		//}
 		switch (i) {
 		case 1:
 			ShapeToRepeat.setFillColor(sf::Color::Cyan);
@@ -324,10 +319,10 @@ void GameEngine::ShapeRepeater(sf::RectangleShape POV,sf::RectangleShape &ShapeT
 			ptrtoheights = new int[numberofshapes];
 
 		}
-		for (int index = 0; index < numberofshapes; index++) {
-			this->HeightRandomizer(ShapeToRepeat, ShapeToRepeat.getSize().y);
-			ptrtoheights[index] = ShapeToRepeat.getSize().y;
-		}
+		//for (int index = 0; index < numberofshapes; index++) {
+		//	this->HeightRandomizer(ShapeToRepeat, ShapeToRepeat.getSize().y);
+		//	ptrtoheights[index] = ShapeToRepeat.getSize().y;
+		//}
 		switch (i) {
 		case 1:
 			ShapeToRepeat.setFillColor(sf::Color::White);
@@ -346,7 +341,7 @@ void GameEngine::ShapeRepeater(sf::RectangleShape POV,sf::RectangleShape &ShapeT
 		if (!firstfunctionsturn) {
 			originalposition.x = ShapeToRepeat.getPosition().x;
 			originalposition.y = ShapeToRepeat.getPosition().y;
-			ShapeToRepeat.setPosition(sf::Vector2f(ShapeToRepeat.getPosition().x,ShapeToRepeat.getPosition().y-ShapeToRepeat.getSize().y) );
+			ShapeToRepeat.setPosition(sf::Vector2f(ShapeToRepeat.getPosition().x, originalposition.y-ShapeToRepeat.getSize().y) );
 		}
 		else {
 			
@@ -362,8 +357,6 @@ void GameEngine::ShapeRepeater(sf::RectangleShape POV,sf::RectangleShape &ShapeT
 	else {
 		firstfunctionsturn = false;
 	}
-
-	
 }
 void GameEngine::HeightRandomizer(sf::RectangleShape& ShapeToAlter, int HeightOfShape) {
 	static int originalheight;
@@ -375,4 +368,76 @@ void GameEngine::HeightRandomizer(sf::RectangleShape& ShapeToAlter, int HeightOf
 	int percentcutoff = 0;
 	percentcutoff = (rand() % (70 - 10 + 1)) + 10;
 	ShapeToAlter.setSize(sf::Vector2f(ShapeToAlter.getSize().x, (percentcutoff / 100.0f) * originalheight));
+}
+
+UIEngine::UIEngine() {
+	GeoSansLight.loadFromFile("assets\\GeosansLight.ttf");
+}
+uiOptions UIEngine::simpleUI(std::string optionNames[4], sf::RenderWindow& window, sf::Event::MouseButtonEvent mouse) {
+	sf::Vector2u size = window.getSize();
+	
+	sf::Text mainMenu("Main Menu", GeoSansLight);
+	mainMenu.setCharacterSize(72);
+	mainMenu.setPosition(size.x/3.6, size.y/6);
+	mainMenu.setOutlineThickness(5);
+	mainMenu.setOutlineColor(sf::Color::Black);
+	
+
+	sf::Text option1(optionNames[0], GeoSansLight);
+	option1.setFillColor(sf::Color::Black);
+	option1.setStyle(sf::Text::Bold);
+	option1.setPosition(sf::Vector2f(size.x / 3 + 12, size.y / 3));
+	sf::Text option2(optionNames[1], GeoSansLight);
+	option2.setFillColor(sf::Color::Black);
+	option2.setStyle(sf::Text::Bold);
+	option2.setPosition(sf::Vector2f(size.x / 3  + 12, size.y / 3 + 60.));
+	sf::Text option3(optionNames[2], GeoSansLight);
+	option3.setFillColor(sf::Color::Black);
+	option3.setStyle(sf::Text::Bold);
+	option3.setPosition(sf::Vector2f(size.x / 3  + 12, size.y / 3 + 120.));
+	sf::Text option4(optionNames[3], GeoSansLight);
+	option4.setFillColor(sf::Color::Black); 
+	option4.setStyle(sf::Text::Bold);
+	option4.setPosition(sf::Vector2f(size.x / 3  + 12, size.y / 3 + 180.));
+
+	sf::RectangleShape opt1(sf::Vector2f(260.f, 40.f));
+	opt1.setFillColor(sf::Color::White);
+	opt1.setOutlineThickness(3.f);
+	opt1.setOutlineColor(sf::Color::Black);
+	opt1.setPosition(sf::Vector2f(size.x/3, size.y/3));
+	sf::RectangleShape opt2(sf::Vector2f(260.f, 40.f));
+	opt2.setFillColor(sf::Color::White);
+	opt2.setOutlineThickness(3.f);
+	opt2.setOutlineColor(sf::Color::Black);
+	opt2.setPosition(sf::Vector2f(size.x / 3 , size.y / 3 + 60.));
+	sf::RectangleShape opt3(sf::Vector2f(260.f, 40.f));
+	opt3.setFillColor(sf::Color::White);
+	opt3.setOutlineThickness(3.f);
+	opt3.setOutlineColor(sf::Color::Black);
+	opt3.setPosition(sf::Vector2f(size.x / 3 , size.y / 3 + 120.));
+	sf::RectangleShape opt4(sf::Vector2f(260.f, 40.f));
+	opt4.setFillColor(sf::Color::White);
+	opt4.setOutlineThickness(3.f);
+	opt4.setOutlineColor(sf::Color::Black);
+	opt4.setPosition(sf::Vector2f(size.x / 3 , size.y / 3 + 180.));
+	
+	uiOptions boolsi;
+	GameEngine G;
+
+	if (G.MouseClick(opt1, mouse)) boolsi.option1 = true;
+	if (G.MouseClick(opt2, mouse)) boolsi.option2 = true;
+	if (G.MouseClick(opt3, mouse)) boolsi.option3 = true;
+	if (G.MouseClick(opt4, mouse)) boolsi.option4 = true;
+
+	window.draw(opt1);
+	window.draw(option1);
+	window.draw(opt2);
+	window.draw(option2);
+	window.draw(opt3);
+	window.draw(option3);
+	window.draw(opt4);
+	window.draw(option4);
+	window.draw(mainMenu);
+	
+	return boolsi;
 }
