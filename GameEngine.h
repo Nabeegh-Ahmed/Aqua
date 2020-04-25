@@ -1,8 +1,13 @@
 #pragma once
 #include<SFML/Graphics.hpp>
 #include<string>
+
 struct CollisionSide {
 	bool top, bottom, left, right;
+};
+
+struct uiOptions {
+	bool option1 = false, option2 = false, option3 = false, option4 = false;
 };
 
 class GameEngine {
@@ -27,3 +32,9 @@ public:
 	//CollisionSide areColliding(sf::CircleShape, sf::CircleShape);
 };
 
+class UIEngine {
+	sf::Font GeoSansLight;
+public:
+	UIEngine();
+	uiOptions simpleUI(std::string optionNames[4], sf::RenderWindow& window, sf::Event::MouseButtonEvent);
+};
