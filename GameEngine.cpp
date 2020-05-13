@@ -2,17 +2,22 @@
 #include<SFML/Graphics.hpp>
 #include<math.h>
 #include<string>
+#include <iostream>
 using namespace std;
 
-bool GameEngine::MouseClick(sf::RectangleShape target, sf::Event::MouseButtonEvent mouse) {
-	sf::Vector2f targetPos = target.getPosition();
-	sf::Vector2f size = target.getSize();
-	if (mouse.x >= targetPos.x && mouse.x <= targetPos.x + size.x && mouse.y >= targetPos.y && mouse.y <= targetPos.y + size.y)
-		return true;
-	else
-		return false;
+bool GPEngine::MouseClick(sf::RectangleShape target, sf::Event e, sf::RenderWindow& window) {
+	sf::Vector2f mouse;
+	mouse.x = sf::Mouse::getPosition(window).x;
+	mouse.y = sf::Mouse::getPosition(window).y;
+	return (
+		target.getGlobalBounds().contains(mouse)&&
+		sf::Mouse::isButtonPressed(sf::Mouse::Left) &&
+		sf::Mouse::ButtonCount == 5
+
+	);
 }
-bool GameEngine::MouseClick(sf::CircleShape target, sf::Event::MouseButtonEvent mouse) {
+
+bool GPEngine::MouseClick(sf::CircleShape target, sf::Event::MouseButtonEvent mouse) {
 	sf::Vector2f targetPos = target.getPosition();
 	float size = target.getRadius();
 	sf::Vector2f origin = target.getOrigin();
@@ -30,7 +35,7 @@ bool GameEngine::MouseClick(sf::CircleShape target, sf::Event::MouseButtonEvent 
 		return false;
 	}
 }
-CollisionSide GameEngine::areColliding(sf::RectangleShape r1, sf::RectangleShape r2) {
+CollisionSide GPEngine::areColliding(sf::RectangleShape r1, sf::RectangleShape r2) {
 	// r1 is moving and check collision with r2
 	CollisionSide collisions;
 	collisions.bottom = false;
@@ -56,7 +61,7 @@ CollisionSide GameEngine::areColliding(sf::RectangleShape r1, sf::RectangleShape
 
 	return collisions;
 }
-CollisionSide GameEngine::areColliding(sf::CircleShape r1, sf::RectangleShape r2) {
+CollisionSide GPEngine::areColliding(sf::CircleShape r1, sf::RectangleShape r2) {
 	CollisionSide c;
 	c.left = false;
 	c.right = false;
@@ -64,18 +69,20 @@ CollisionSide GameEngine::areColliding(sf::CircleShape r1, sf::RectangleShape r2
 	c.top = false;
 	sf::Vector2f CirclePosition = r1.getPosition();
 	double CircleSize = r1.getRadius();
-	CirclePosition.x += CircleSize;
-	CirclePosition.y += CircleSize;
+	CirclePosition.x = CirclePosition.x + CircleSize;
+	CirclePosition.y = CirclePosition.y + CircleSize;
 	sf::Vector2f RectanglePosition = r2.getPosition();
 	sf::Vector2f RectangleSize = r2.getSize();
 	sf::Vector2f Collisioncoords = CirclePosition;
 	Collisioncoords.x = CirclePosition.x + CircleSize;
 	Collisioncoords.y = CirclePosition.y;
+	float Rec_Pos_Size_y = (RectanglePosition.y + RectangleSize.y);
+	
 	for (double angle = 0.0,incrementer=0.0; angle <= 90; angle += 3,incrementer+= 0.03333333) {
-		if ((((Collisioncoords.x - CircleSize * incrementer) >= (RectanglePosition.x)) && ((Collisioncoords.x - CircleSize * incrementer) <= (RectanglePosition.x + 3.5))) && (((Collisioncoords.y - CircleSize * incrementer) >= (RectanglePosition.y)) && ((Collisioncoords.y - CircleSize * incrementer) <= (RectanglePosition.y + RectangleSize.y)))) {
+		if ((((Collisioncoords.x - CircleSize * incrementer) >= (RectanglePosition.x)) && ((Collisioncoords.x - CircleSize * incrementer) <= (RectanglePosition.x + 3.5))) && (((Collisioncoords.y - CircleSize * incrementer) >= (RectanglePosition.y)) && ((Collisioncoords.y - CircleSize * incrementer) <= Rec_Pos_Size_y))) {
 			c.left = true;
 		}
-		if ((((Collisioncoords.x - CircleSize * incrementer) >= (RectanglePosition.x)) && ((Collisioncoords.x - CircleSize * incrementer) <= (RectanglePosition.x + RectangleSize.x))) && (((Collisioncoords.y - CircleSize * incrementer) >= (RectanglePosition.y+RectangleSize.y-3.5)) && ((Collisioncoords.y - CircleSize * incrementer) <= (RectanglePosition.y + RectangleSize.y)))) {
+		if ((((Collisioncoords.x - CircleSize * incrementer) >= (RectanglePosition.x)) && ((Collisioncoords.x - CircleSize * incrementer) <= (RectanglePosition.x + RectangleSize.x))) && (((Collisioncoords.y - CircleSize * incrementer) >= (Rec_Pos_Size_y -3.5)) && ((Collisioncoords.y - CircleSize * incrementer) <= Rec_Pos_Size_y))) {
 			c.bottom=true;
 		}
 	}
@@ -112,7 +119,7 @@ CollisionSide GameEngine::areColliding(sf::CircleShape r1, sf::RectangleShape r2
 	return c;
 	
 }
-void GameEngine::Gravity(sf::RectangleShape &fallingobject, sf::RectangleShape& base) {
+void GPEngine::Gravity(sf::RectangleShape &fallingobject, sf::RectangleShape& base) {
 	CollisionSide _base = this->areColliding(fallingobject, base);
 	static double velocity = 0.01;
 	double acceleration = 0.0010;
@@ -133,7 +140,7 @@ void GameEngine::Gravity(sf::RectangleShape &fallingobject, sf::RectangleShape& 
 		fallingobject.move(0.f, 3.f);
 	}
 }
-void GameEngine::Gravity(sf::CircleShape& fallingobject, sf::RectangleShape& base) {
+void GPEngine::Gravity(sf::CircleShape& fallingobject, sf::RectangleShape& base) {
 	CollisionSide _base = this->areColliding(fallingobject, base);
 	static double velocity = 0.1;
 	double acceleration = 0.010;
@@ -151,7 +158,7 @@ void GameEngine::Gravity(sf::CircleShape& fallingobject, sf::RectangleShape& bas
 		velocity = 0.1;
 	}
 }
-void GameEngine::animation(sf::RectangleShape& shape, sf::Texture* left, sf::Texture* right, sf::Texture* up, sf::Texture* down) {
+void GPEngine::animation(sf::RectangleShape& shape, sf::Texture* left, sf::Texture* right, sf::Texture* up, sf::Texture* down) {
 	static int xvelocity = 0.1;
 	static int yvelocity = 0.1;
 	int lastyvelocity = yvelocity;
@@ -172,7 +179,29 @@ void GameEngine::animation(sf::RectangleShape& shape, sf::Texture* left, sf::Tex
 		shape.setTexture(down);
 	}
 }
-void GameEngine::Gravity(sf::RectangleShape& fallingobject, CollisionSide isfalling) {
+void GPEngine::animation(sf::CircleShape& shape, sf::Texture* left, sf::Texture* right, sf::Texture* up, sf::Texture* down) {
+	static int xvelocity = 0.1;
+	static int yvelocity = 0.1;
+	int lastyvelocity = yvelocity;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+		shape.setTexture(left);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+		shape.setTexture(right);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+		shape.setTexture(up);
+		yvelocity++;
+	}
+	else {
+		yvelocity--;
+	}
+	if (lastyvelocity > yvelocity || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+		shape.setTexture(down);
+	}
+}
+
+void GPEngine::Gravity(sf::RectangleShape& fallingobject, CollisionSide isfalling) {
 	static double velocity = 0.1;
 	double acceleration = 0.0010;
 	if (isfalling.top == false) {
@@ -189,7 +218,7 @@ void GameEngine::Gravity(sf::RectangleShape& fallingobject, CollisionSide isfall
 		velocity = 0.001;
 	}
 }
-void GameEngine::Gravity(sf::CircleShape& fallingobject, CollisionSide isfalling) {
+void GPEngine::Gravity(sf::CircleShape& fallingobject, CollisionSide isfalling) {
 	static double velocity = 0.1;
 	double acceleration = 0.0010;
 	if (isfalling.top == false) {
@@ -206,7 +235,7 @@ void GameEngine::Gravity(sf::CircleShape& fallingobject, CollisionSide isfalling
 		velocity = 0.001;
 	}
 }
-void GameEngine::enableMovement(sf::RectangleShape& shape) {
+void GPEngine::enableMovement(sf::RectangleShape& shape) {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 		shape.move(-1.f, 0.f);
 	}
@@ -220,7 +249,7 @@ void GameEngine::enableMovement(sf::RectangleShape& shape) {
 		shape.move(0.f, 1.f);
 	}
 }
-void GameEngine::enableMovement(sf::CircleShape& shape) {
+void GPEngine::enableMovement(sf::CircleShape& shape) {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 		shape.move(-1.f, 0.f);
 	}
@@ -234,29 +263,29 @@ void GameEngine::enableMovement(sf::CircleShape& shape) {
 		shape.move(0.f, 1.f);
 	}
 }
-void GameEngine::moveView(sf::RectangleShape& shape, sf::View& view) {
+void GPEngine::moveView(sf::RectangleShape& shape, sf::View& view) {
 	sf::Vector2f pos = shape.getPosition();
 	view.setSize(sf::Vector2f(shape.getSize().x * 5, shape.getSize().x * 5));
 	view.setCenter(sf::Vector2f(pos.x+shape.getSize().x/2, pos.y));
 }
-void GameEngine::Light(sf::RectangleShape base, sf::Shader& shader) {
-	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
+void GPEngine::Light(sf::RectangleShape base, sf::Shader& shader) {
+	shader.loadFromFile("assets/vertex_shader.vert", "assets/fragment_shader.frag");
 	shader.setUniform("hasTexture", true);
 	sf::Vector2f pos;
 	pos.x = base.getPosition().x;
 	pos.y = base.getPosition().y - base.getSize().y;
 	shader.setUniform("lightPos", pos);
 }
-void GameEngine::FollowLight(sf::RectangleShape shape, sf::Shader& shader) {
-	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
+void GPEngine::FollowLight(sf::RectangleShape shape, sf::Shader& shader) {
+	shader.loadFromFile("assets/vertex_shader.vert", "assets/fragment_shader.frag");
 	shader.setUniform("hasTexture", true);
 	shader.setUniform("lightPos", sf::Vector2f(shape.getPosition().x+shape.getSize().x/2, shape.getPosition().y - shape.getSize().y*2));
 }
-void GameEngine::Light(sf::CircleShape s1, sf::Shader& shader) {
-	shader.loadFromFile("assets\\vertex_shader.vert", "assets\\fragment_shader.frag");
+void GPEngine::Light(sf::CircleShape s1, sf::Shader& shader) {
+	shader.loadFromFile("assets/vertex_shader.vert", "assets/fragment_shader.frag");
 	shader.setUniform("hasTexture", true);
 }
-void GameEngine::ShapeRepeater(sf::RectangleShape POV,sf::RectangleShape &ShapeToRepeat, sf::RenderWindow & screen, sf::Vector2f& StartingPos, float DistanceBetweenShape) {
+void GPEngine::ShapeRepeater(sf::RectangleShape POV,sf::RectangleShape &ShapeToRepeat, sf::RenderWindow & screen, sf::Vector2f& StartingPos, float DistanceBetweenShape) {
 	int i = 0;
 	int counter = 0;
 	static int numberofshapes=0;
@@ -358,7 +387,7 @@ void GameEngine::ShapeRepeater(sf::RectangleShape POV,sf::RectangleShape &ShapeT
 		firstfunctionsturn = false;
 	}
 }
-void GameEngine::HeightRandomizer(sf::RectangleShape& ShapeToAlter, int HeightOfShape) {
+void GPEngine::HeightRandomizer(sf::RectangleShape& ShapeToAlter, int HeightOfShape) {
 	static int originalheight;
 	static bool firsttime = true;
 	if (firsttime) {
@@ -373,15 +402,15 @@ void GameEngine::HeightRandomizer(sf::RectangleShape& ShapeToAlter, int HeightOf
 UIEngine::UIEngine() {
 	GeoSansLight.loadFromFile("assets\\GeosansLight.ttf");
 }
-uiOptions UIEngine::simpleUI(std::string optionNames[4], sf::RenderWindow& window, sf::Event::MouseButtonEvent mouse) {
+uiOptions UIEngine::simpleUI(std::string optionNames[4], sf::RenderWindow& window, sf::Event mouse) {
 	sf::Vector2u size = window.getSize();
-	
+
 	sf::Text mainMenu("Main Menu", GeoSansLight);
 	mainMenu.setCharacterSize(72);
-	mainMenu.setPosition(size.x/3.6, size.y/6);
+	mainMenu.setPosition(size.x / 3.6, size.y / 6);
 	mainMenu.setOutlineThickness(5);
 	mainMenu.setOutlineColor(sf::Color::Black);
-	
+
 
 	sf::Text option1(optionNames[0], GeoSansLight);
 	option1.setFillColor(sf::Color::Black);
@@ -390,44 +419,44 @@ uiOptions UIEngine::simpleUI(std::string optionNames[4], sf::RenderWindow& windo
 	sf::Text option2(optionNames[1], GeoSansLight);
 	option2.setFillColor(sf::Color::Black);
 	option2.setStyle(sf::Text::Bold);
-	option2.setPosition(sf::Vector2f(size.x / 3  + 12, size.y / 3 + 60.));
+	option2.setPosition(sf::Vector2f(size.x / 3 + 12, size.y / 3 + 60.));
 	sf::Text option3(optionNames[2], GeoSansLight);
 	option3.setFillColor(sf::Color::Black);
 	option3.setStyle(sf::Text::Bold);
-	option3.setPosition(sf::Vector2f(size.x / 3  + 12, size.y / 3 + 120.));
+	option3.setPosition(sf::Vector2f(size.x / 3 + 12, size.y / 3 + 120.));
 	sf::Text option4(optionNames[3], GeoSansLight);
-	option4.setFillColor(sf::Color::Black); 
+	option4.setFillColor(sf::Color::Black);
 	option4.setStyle(sf::Text::Bold);
-	option4.setPosition(sf::Vector2f(size.x / 3  + 12, size.y / 3 + 180.));
+	option4.setPosition(sf::Vector2f(size.x / 3 + 12, size.y / 3 + 180.));
 
 	sf::RectangleShape opt1(sf::Vector2f(260.f, 40.f));
 	opt1.setFillColor(sf::Color::White);
 	opt1.setOutlineThickness(3.f);
 	opt1.setOutlineColor(sf::Color::Black);
-	opt1.setPosition(sf::Vector2f(size.x/3, size.y/3));
+	opt1.setPosition(sf::Vector2f(size.x / 3, size.y / 3));
 	sf::RectangleShape opt2(sf::Vector2f(260.f, 40.f));
 	opt2.setFillColor(sf::Color::White);
 	opt2.setOutlineThickness(3.f);
 	opt2.setOutlineColor(sf::Color::Black);
-	opt2.setPosition(sf::Vector2f(size.x / 3 , size.y / 3 + 60.));
+	opt2.setPosition(sf::Vector2f(size.x / 3, size.y / 3 + 60.));
 	sf::RectangleShape opt3(sf::Vector2f(260.f, 40.f));
 	opt3.setFillColor(sf::Color::White);
 	opt3.setOutlineThickness(3.f);
 	opt3.setOutlineColor(sf::Color::Black);
-	opt3.setPosition(sf::Vector2f(size.x / 3 , size.y / 3 + 120.));
+	opt3.setPosition(sf::Vector2f(size.x / 3, size.y / 3 + 120.));
 	sf::RectangleShape opt4(sf::Vector2f(260.f, 40.f));
 	opt4.setFillColor(sf::Color::White);
 	opt4.setOutlineThickness(3.f);
 	opt4.setOutlineColor(sf::Color::Black);
-	opt4.setPosition(sf::Vector2f(size.x / 3 , size.y / 3 + 180.));
-	
-	uiOptions boolsi;
-	GameEngine G;
+	opt4.setPosition(sf::Vector2f(size.x / 3, size.y / 3 + 180.));
 
-	if (G.MouseClick(opt1, mouse)) boolsi.option1 = true;
-	if (G.MouseClick(opt2, mouse)) boolsi.option2 = true;
-	if (G.MouseClick(opt3, mouse)) boolsi.option3 = true;
-	if (G.MouseClick(opt4, mouse)) boolsi.option4 = true;
+	uiOptions boolsi;
+	GPEngine G;
+
+	if (G.MouseClick(opt1, mouse, window)) boolsi.option1 = true;
+	if (G.MouseClick(opt2, mouse, window)) boolsi.option2 = true;
+	if (G.MouseClick(opt3, mouse, window)) boolsi.option3 = true;
+	if (G.MouseClick(opt4, mouse, window)) boolsi.option4 = true;
 
 	window.draw(opt1);
 	window.draw(option1);
@@ -438,6 +467,43 @@ uiOptions UIEngine::simpleUI(std::string optionNames[4], sf::RenderWindow& windo
 	window.draw(opt4);
 	window.draw(option4);
 	window.draw(mainMenu);
-	
+
 	return boolsi;
+}
+
+Button::Button() {
+	block.setSize(sf::Vector2f(80., 80.));
+	block.setFillColor(sf::Color::Red);
+	block.setOutlineColor(sf::Color::Black);
+	block.setOutlineThickness(2.);
+	font.loadFromFile("assets/GeosansLight.ttf");
+	text.setFont(font);
+	text.setStyle(sf::Text::Bold);
+	text.setPosition(sf::Vector2f(block.getPosition().x + 20., block.getPosition().y - 5));
+}
+void Button::setSize(double height, double width) {
+	this->block.setSize(sf::Vector2f(width, height));
+}
+void Button::setPosition(double x, double y) {
+	this->block.setPosition(sf::Vector2f(x, y));
+	text.setPosition(sf::Vector2f(block.getPosition().x + 20., block.getPosition().y - 5));
+}
+void Button::Draw(sf::RenderWindow & window) {
+	window.draw(block);
+	window.draw(text);
+}
+std::string Button::getValue() {
+	return text.getString();
+}
+void Button::setColor(sf::Color color) {
+	this->block.setFillColor(color);
+}
+bool Button::Click(sf::Event event, sf::RenderWindow window) {
+	return (Engine.MouseClick(this->block, event, window));
+}
+bool Button::Hover(sf::RenderWindow window) {
+	sf::Vector2f mouse;
+	mouse.x = sf::Mouse::getPosition(window).x;
+	mouse.y = sf::Mouse::getPosition(window).y;
+	return (block.getGlobalBounds().contains(mouse));
 }
